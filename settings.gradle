@@ -1,0 +1,15 @@
+pluginManagement {
+	repositories {
+		maven {
+			url = "https://maven.flintloader.net/releases"
+		}
+		maven {
+			url = "https://maven.flintloader.net/mirror"
+		}
+		mavenLocal()
+		gradlePluginPortal()
+	}
+}
+rootProject.name = 'punch'
+include 'minecraft'
+

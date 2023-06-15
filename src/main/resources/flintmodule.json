@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "flintloader",
+  "name": "Flint Loader",
+  "version": "${version}",
+  "description": "The base mod loader."
+}
