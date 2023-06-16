@@ -27,6 +27,10 @@ import net.flintloader.loader.modules.resolver.IModuleResolver;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 
+/**
+ * @author HypherionSA
+ * Load modules from the modules directory
+ */
 public class DirectoryModuleResolver implements IModuleResolver {
 
 	private final File runDirectory = new File(".");
@@ -42,10 +46,10 @@ public class DirectoryModuleResolver implements IModuleResolver {
 		File[] modules = modulesDirectory.listFiles();
 		if (modules != null) {
 			for (File file : modules) {
+				if (!file.isFile()) continue;
 				if (!file.getName().endsWith(".jar")) continue;
 
 				try (JarFile jarFile = new JarFile(file)) {
-					if (!file.isFile()) continue;
 
 					JarEntry entry = jarFile.getJarEntry("flintmodule.json");
 					if (entry != null) {

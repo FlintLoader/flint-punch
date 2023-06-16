@@ -32,5 +32,5 @@ public interface FlintModule {
 	 * This is called when all minecraft variables and systems have loaded, just before the loading screen is shown.
 	 * Trying to access game data here is safe
 	 */
-    public void initializeModule();
+	void initializeModule();
 }

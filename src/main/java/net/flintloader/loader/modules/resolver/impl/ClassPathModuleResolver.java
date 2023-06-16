@@ -32,6 +32,10 @@ import net.flintloader.punch.impl.util.UrlUtil;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 
+/**
+ * @author HypherionSA
+ * Load mods from classpath during development
+ */
 public final class ClassPathModuleResolver implements IModuleResolver {
 
 	@Override
@@ -69,5 +73,4 @@ public final class ClassPathModuleResolver implements IModuleResolver {
 			}
 		}
 	}
-
 }

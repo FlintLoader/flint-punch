@@ -16,12 +16,17 @@
 **/
 package net.flintloader.punch.impl;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import net.fabricmc.accesswidener.AccessWidenerReader;
+
 import net.flintloader.loader.core.FlintLoader;
+import net.flintloader.loader.modules.FlintModuleMetadata;
+import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.punch.PunchLoader;
 import net.flintloader.punch.api.MappingResolver;
 import net.flintloader.punch.api.ObjectShare;
@@ -41,7 +46,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 
 	public static final int ASM_VERSION = Opcodes.ASM9;
 
-	public static final String VERSION = "0.0.1";
+	public static final String VERSION = "0.0.2";
 
 	public static final String CACHE_DIR_NAME = ".punch"; // relative to game dir
 	public static final String REMAPPED_JARS_DIR_NAME = "remappedJars"; // relative to cache dir
@@ -167,22 +172,23 @@ public final class PunchLoaderImpl extends PunchLoader {
 
 	public void loadAccessWideners() {
 		// TODO ACCESS WIDENERS
-		/*AccessWidenerReader accessWidenerReader = new AccessWidenerReader(accessWidener);
+		AccessWidenerReader accessWidenerReader = new AccessWidenerReader(accessWidener);
 
-		for (ModContainer modContainer : getAllMods()) {
-			LoaderModMetadata modMetadata = (LoaderModMetadata) modContainer.getMetadata();
-			String accessWidener = modMetadata.getAccessWidener();
+		for (FlintModuleMetadata modContainer : ModuleList.getInstance().allModules()) {
+			if (modContainer.isBuiltIn()) continue;
+
+			String accessWidener = modContainer.getAccessWidener();
 			if (accessWidener == null) continue;
 
 			Path path = modContainer.findPath(accessWidener).orElse(null);
-			if (path == null) throw new RuntimeException(String.format("Missing accessWidener file %s from mod %s", accessWidener, modContainer.getMetadata().getId()));
+			if (path == null) throw new RuntimeException(String.format("Missing accessWidener file %s from module %s", accessWidener, modContainer.getId()));
 
 			try (BufferedReader reader = Files.newBufferedReader(path)) {
 				accessWidenerReader.read(reader, getMappingResolver().getCurrentRuntimeNamespace());
 			} catch (Exception e) {
-				throw new RuntimeException("Failed to read accessWidener file from mod " + modMetadata.getId(), e);
+				throw new RuntimeException("Failed to read accessWidener file from mod " + modContainer.getId(), e);
 			}
-		}*/
+		}
 	}
 
 	public void prepareModInit(Path newRunDir, Object gameInstance) {
@@ -238,6 +244,8 @@ public final class PunchLoaderImpl extends PunchLoader {
 		} else {
 			setGameDir(newRunDir);
 		}
+
+		FlintLoader.gatherEntryPoints();
 	}
 
 	public AccessWidener getAccessWidener() {

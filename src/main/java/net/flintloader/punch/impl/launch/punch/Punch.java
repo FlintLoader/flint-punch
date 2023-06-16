@@ -133,6 +133,8 @@ public final class Punch extends PunchLauncherBase {
 		provider.unlockClassPath(this);
 		unlocked = true;
 
+		FlintLoader.earlyInitModules();
+
 		return cl;
 	}
 

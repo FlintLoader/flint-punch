@@ -27,6 +27,7 @@ import net.flintloader.loader.api.FlintModule;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.loader.modules.Strings;
+import net.flintloader.loader.modules.entrypoint.EntryPointUtil;
 import net.flintloader.punch.impl.launch.PunchLauncherBase;
 import net.flintloader.punch.impl.util.LoaderUtil;
 import net.flintloader.punch.impl.util.log.Log;
@@ -35,29 +36,38 @@ import net.flintloader.punch.impl.util.log.LogCategory;
 /**
  * @author HypherionSA
  * @date 23/06/2022
+ * Internal Hooks to handle module loading and registering
  */
-public class FlintLoader {
+public final class FlintLoader {
 
 	public static final Gson gson = new Gson();
 	private static final Map<String, FlintModule> entryPoints = new HashMap<>();
 
+	/**
+	 * Discover installed modules from modules dir and classpath during development
+	 */
     public static void discoverModules() {
 		ModuleList.getInstance().discoverModules();
-		gatherEntryPoints();
     }
 
+	/**
+	 * Check if module dependencies are met and add them to the classpath
+	 */
 	public static void finishModuleSetup() {
 		checkDependencies();
-        for (FlintModuleMetadata module : ModuleList.getInstance().allModules()) {
-            if (!module.isBuiltIn()) {
+
+		for (FlintModuleMetadata module : ModuleList.getInstance().allModules()) {
+			if (!module.isBuiltIn()) {
 				if (!module.getId().equalsIgnoreCase("flintloader")) {
 					PunchLauncherBase.getLauncher().addToClassPath(LoaderUtil.normalizePath(module.getSource()));
 				}
 			}
-        }
-		earlyInitModules();
+		}
     }
 
+	/**
+	 * Check for required and breaking dependencies
+	 */
 	private static void checkDependencies() {
 		List<String> missing = new ArrayList<>();
 		List<String> invalid = new ArrayList<>();
@@ -100,6 +110,9 @@ public class FlintLoader {
 		// TODO - Handle incompatible mod sets!
 	}
 
+	/**
+	 * Call the {@link FlintModule#earlyInitialization()} method on modules
+	 */
 	public static void earlyInitModules() {
 		entryPoints.forEach((s, flintModule) -> {
 			try {
@@ -110,6 +123,9 @@ public class FlintLoader {
 		});
 	}
 
+	/**
+	 * Call the {@link FlintModule#initializeModule()} method on modules
+	 */
 	public static void initializeModules() {
 		entryPoints.forEach((s, flintModule) -> {
 			try {
@@ -120,15 +136,19 @@ public class FlintLoader {
 		});
     }
 
-	private static void gatherEntryPoints() {
+	/**
+	 * Discover declared entry points from modules
+	 */
+	public static void gatherEntryPoints() {
 		for (FlintModuleMetadata metadata : ModuleList.getInstance().allModules()) {
-			if (!metadata.isBuiltIn() && metadata.getEntryPoint() != null) {
-				try {
-					Class<?> clazz = PunchLauncherBase.getClass(metadata.getEntryPoint());
-					entryPoints.put(metadata.getId(), ((FlintModule)clazz.newInstance()));
-				} catch (Exception e) {
-					Log.error(LogCategory.ENTRYPOINT, "Failed to discover entry points for '" + metadata.getId() + "'");
-				}
+			if (metadata.isBuiltIn() || metadata.getEntryPoint() == null)
+				continue;
+
+			try {
+				Class<?> clazz = EntryPointUtil.getClass(metadata.getEntryPoint());
+				entryPoints.put(metadata.getId(), (FlintModule) EntryPointUtil.createInstance(clazz));
+			} catch (Exception e) {
+				Log.error(LogCategory.ENTRYPOINT, "Failed to discover entry points for '" + metadata.getId() + "'", e);
 			}
 		}
 	}

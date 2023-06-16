@@ -16,10 +16,12 @@
 **/
 package net.flintloader.loader.modules;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author HypherionSA
@@ -134,5 +136,11 @@ public class FlintModuleMetadata {
 
 	public String getEntryPoint() {
 		return entryPoint;
+	}
+
+	public Optional<Path> findPath(String file) {
+		Path path = getSource().resolve(file.replace("/", getSource().getFileSystem().getSeparator()));
+		if (Files.exists(path)) return Optional.of(path);
+		return Optional.empty();
 	}
 }
