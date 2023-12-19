@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package net.flintloader.loader.api;
 
 /**
  * @author HypherionSA
- * @date 24/06/2022
  */
 public interface FlintModule {
 

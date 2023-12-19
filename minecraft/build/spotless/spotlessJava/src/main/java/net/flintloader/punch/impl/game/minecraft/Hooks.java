@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.io.File;
 
 import net.flintloader.loader.core.FlintLoader;
 import net.flintloader.punch.impl.PunchLoaderImpl;
+import net.flintloader.punch.impl.util.log.Log;
+import net.flintloader.punch.impl.util.log.LogCategory;
 
 public final class Hooks {
 	public static final String INTERNAL_NAME = Hooks.class.getName().replace('.', '/');
@@ -28,6 +30,15 @@ public final class Hooks {
 
 	public static final String FLINT = "flint";
 	public static final String VANILLA = "vanilla";
+
+	public static String insertBranding(final String brand) {
+		if (brand == null || brand.isEmpty()) {
+			Log.warn(LogCategory.GAME_PROVIDER, "Null or empty branding found!", new IllegalStateException());
+			return FLINT;
+		}
+
+		return VANILLA.equals(brand) ? FLINT : brand + ',' + FLINT;
+	}
 
 	public static void startClient(File runDir, Object gameInstance) {
 		if (runDir == null) {

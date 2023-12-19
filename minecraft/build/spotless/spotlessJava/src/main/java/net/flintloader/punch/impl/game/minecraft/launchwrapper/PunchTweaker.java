@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import net.flintloader.loader.core.FlintLoader;
 import net.flintloader.punch.impl.FormattedException;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.game.GameProvider;
@@ -156,6 +157,7 @@ public abstract class PunchTweaker extends PunchLauncherBase implements ITweaker
 		MixinEnvironment.getDefaultEnvironment().setSide(MixinEnvironment.Side.CLIENT);
 
 		provider.unlockClassPath(this);
+		FlintLoader.earlyInitModules();
 	}
 
 	@Override

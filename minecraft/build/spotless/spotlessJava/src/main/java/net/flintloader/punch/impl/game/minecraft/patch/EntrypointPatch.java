@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -21,11 +21,17 @@ import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import net.flintloader.punch.api.Version;
+import net.flintloader.punch.api.VersionParsingException;
+import net.flintloader.punch.api.metadata.version.VersionPredicate;
 import net.flintloader.punch.impl.game.minecraft.Hooks;
+import net.flintloader.punch.impl.game.minecraft.MinecraftGameProvider;
 import net.flintloader.punch.impl.game.patch.GamePatch;
 import net.flintloader.punch.impl.launch.PunchLauncher;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
+import net.flintloader.punch.impl.util.version.VersionParser;
+import net.flintloader.punch.impl.util.version.VersionPredicateParser;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -40,14 +46,23 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 public class EntrypointPatch extends GamePatch {
+
+	private static final VersionPredicate VERSION_1_19_4 = createVersionPredicate(">=1.19.4-");
+	private final MinecraftGameProvider gameProvider;
+
+	public EntrypointPatch(MinecraftGameProvider gameProvider) {
+		this.gameProvider = gameProvider;
+	}
+
 	private void finishEntrypoint(ListIterator<AbstractInsnNode> it) {
 		String methodName = String.format("start%s", "Client");
 		it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, Hooks.INTERNAL_NAME, methodName, "(Ljava/io/File;Ljava/lang/Object;)V", false));
 	}
 
 	@Override
-	public void process(PunchLauncher launcher, Function<String, ClassReader> classSource, Consumer<ClassNode> classEmitter) {
+	public void process(PunchLauncher launcher, Function<String, ClassNode> classSource, Consumer<ClassNode> classEmitter) {
 		String entrypoint = launcher.getEntrypoint();
+		Version gameVersion = getGameVersion();
 
 		if (!entrypoint.startsWith("net.minecraft.") && !entrypoint.startsWith("com.mojang.")) {
 			return;
@@ -56,7 +71,7 @@ public class EntrypointPatch extends GamePatch {
 		String gameEntrypoint = null;
 		boolean serverHasFile = true;
 		boolean isApplet = entrypoint.contains("Applet");
-		ClassNode mainClass = readClass(classSource.apply(entrypoint));
+		ClassNode mainClass = classSource.apply(entrypoint);
 
 		if (mainClass == null) {
 			throw new RuntimeException("Could not load main class " + entrypoint + "!");
@@ -143,13 +158,14 @@ public class EntrypointPatch extends GamePatch {
 		if (gameEntrypoint.equals(entrypoint) || is20w22aServerOrHigher) {
 			gameClass = mainClass;
 		} else {
-			gameClass = readClass(classSource.apply(gameEntrypoint));
+			gameClass = classSource.apply(gameEntrypoint);
 			if (gameClass == null) throw new RuntimeException("Could not load game class " + gameEntrypoint + "!");
 		}
 
 		MethodNode gameMethod = null;
 		MethodNode gameConstructor = null;
 		AbstractInsnNode lwjglLogNode = null;
+		AbstractInsnNode currentThreadNode = null;
 		int gameMethodQuality = 0;
 
 		if (!is20w22aServerOrHigher) {
@@ -167,12 +183,19 @@ public class EntrypointPatch extends GamePatch {
 					// Try to find a method with an LDC string "LWJGL Version: ".
 					// This is the "init()" method, or as of 19w38a is the constructor, or called somewhere in that vicinity,
 					// and is by far superior in hooking into for a well-off mod start.
+					// Also try and find a Thread.currentThread() call before the LWJGL version print.
 
 					int qual = 2;
 					boolean hasLwjglLog = false;
 
 					for (AbstractInsnNode insn : gmCandidate.instructions) {
-						if (insn instanceof LdcInsnNode) {
+						if (insn.getOpcode() == Opcodes.INVOKESTATIC && insn instanceof MethodInsnNode) {
+							final MethodInsnNode methodInsn = (MethodInsnNode) insn;
+
+							if ("currentThread".equals(methodInsn.name) && "java/lang/Thread".equals(methodInsn.owner) && "()Ljava/lang/Thread;".equals(methodInsn.desc)) {
+								currentThreadNode = methodInsn;
+							}
+						} else if (insn instanceof LdcInsnNode) {
 							Object cst = ((LdcInsnNode) insn).cst;
 
 							if (cst instanceof String) {
@@ -283,7 +306,11 @@ public class EntrypointPatch extends GamePatch {
 						it = gameMethod.instructions.iterator();
 					}
 
-					if (lwjglLogNode != null) {
+					// Add the hook just before the Thread.currentThread() call for 1.19.4 or later
+					// If older 4 method insn's before the lwjgl log
+					if (currentThreadNode != null && VERSION_1_19_4.test(gameVersion)) {
+						moveBefore(it, currentThreadNode);
+					} else if (lwjglLogNode != null) {
 						moveBefore(it, lwjglLogNode);
 
 						for (int i = 0; i < 4; i++) {
@@ -317,22 +344,22 @@ public class EntrypointPatch extends GamePatch {
 		}
 	}
 
-	private boolean hasSuperClass(String cls, String superCls, Function<String, ClassReader> classSource) {
+	private boolean hasSuperClass(String cls, String superCls, Function<String, ClassNode> classSource) {
 		if (cls.contains("$") || (!cls.startsWith("net/minecraft") && cls.contains("/"))) {
 			return false;
 		}
 
-		ClassReader reader = classSource.apply(cls);
+		ClassNode classNode = classSource.apply(cls);
 
-		return reader != null && reader.getSuperName().equals(superCls);
+		return classNode != null && classNode.superName.equals(superCls);
 	}
 
-	private boolean hasStrInMethod(String cls, String methodName, String methodDesc, String str, Function<String, ClassReader> classSource) {
+	private boolean hasStrInMethod(String cls, String methodName, String methodDesc, String str, Function<String, ClassNode> classSource) {
 		if (cls.contains("$") || (!cls.startsWith("net/minecraft") && cls.contains("/"))) {
 			return false;
 		}
 
-		ClassNode node = readClass(classSource.apply(cls));
+		ClassNode node = classSource.apply(cls);
 		if (node == null) return false;
 
 		for (MethodNode method : node.methods) {
@@ -354,5 +381,21 @@ public class EntrypointPatch extends GamePatch {
 		}
 
 		return false;
+	}
+
+	private Version getGameVersion() {
+		try {
+			return VersionParser.parseSemantic(gameProvider.getNormalizedGameVersion());
+		} catch (VersionParsingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static VersionPredicate createVersionPredicate(String predicate) {
+		try {
+			return VersionPredicateParser.parse(predicate);
+		} catch (VersionParsingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

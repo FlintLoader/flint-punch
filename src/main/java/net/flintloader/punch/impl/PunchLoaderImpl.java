@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 
 	public static final int ASM_VERSION = Opcodes.ASM9;
 
-	public static final String VERSION = "0.0.2";
+	public static final String VERSION = "0.0.1";
 
 	public static final String CACHE_DIR_NAME = ".punch"; // relative to game dir
 	public static final String REMAPPED_JARS_DIR_NAME = "remappedJars"; // relative to cache dir

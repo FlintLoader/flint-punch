@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -32,14 +32,6 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public abstract class GamePatch {
-	protected static ClassNode readClass(ClassReader reader) {
-		if (reader == null) return null;
-
-		ClassNode node = new ClassNode();
-		reader.accept(node, 0);
-		return node;
-	}
-
 	protected FieldNode findField(ClassNode node, Predicate<FieldNode> predicate) {
 		return node.fields.stream().filter(predicate).findAny().orElse(null);
 	}
@@ -127,5 +119,5 @@ public abstract class GamePatch {
 		return ((access & 0x0F) == (Opcodes.ACC_PUBLIC | 0 /* non-static */));
 	}
 
-	public abstract void process(PunchLauncher launcher, Function<String, ClassReader> classSource, Consumer<ClassNode> classEmitter);
+	public abstract void process(PunchLauncher launcher, Function<String, ClassNode> classSource, Consumer<ClassNode> classEmitter);
 }

@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public final class SystemProperties {
 	public static final String DEBUG_RESOLUTION_TIMEOUT = "flint.debug.resolutionTimeout";
 	// replace mod versions (modA:versionA,modB:versionB,...)
 	public static final String DEBUG_REPLACE_VERSION = "flint.debug.replaceVersion";
+	public static final String UNIT_TEST = "flint.unitTest";
 
 	private SystemProperties() {
 	}

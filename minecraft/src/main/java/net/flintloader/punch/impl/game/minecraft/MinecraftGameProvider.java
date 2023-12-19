@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 HypherionSA and contributors
+* Copyright 2023 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -38,8 +38,10 @@ import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.game.GameProvider;
 import net.flintloader.punch.impl.game.GameProviderHelper;
 import net.flintloader.punch.impl.game.LibClassifier;
+import net.flintloader.punch.impl.game.minecraft.patch.BrandingPatch;
 import net.flintloader.punch.impl.game.minecraft.patch.EntrypointPatch;
 import net.flintloader.punch.impl.game.minecraft.patch.EntrypointPatchFML125;
+import net.flintloader.punch.impl.game.minecraft.patch.TinyFDPatch;
 import net.flintloader.punch.impl.game.patch.GameTransformer;
 import net.flintloader.punch.impl.launch.PunchLauncher;
 import net.flintloader.punch.impl.util.Arguments;
@@ -63,6 +65,7 @@ public class MinecraftGameProvider implements GameProvider {
 			"userproperties",
 			"uuid",
 			"xuid"));
+
 	private String entrypoint;
 	private Arguments arguments;
 	private final List<Path> gameJars = new ArrayList<>(2); // env game jar and potentially common game jar
@@ -75,9 +78,11 @@ public class MinecraftGameProvider implements GameProvider {
 	private McVersion versionData;
 	private boolean hasModLoader = false;
 
-	private static final GameTransformer TRANSFORMER = new GameTransformer(
-			new EntrypointPatch(),
-			new EntrypointPatchFML125());
+	private final GameTransformer transformer = new GameTransformer(
+			new EntrypointPatch(this),
+			new BrandingPatch(),
+			new EntrypointPatchFML125(),
+			new TinyFDPatch());
 
 	@Override
 	public String getGameId() {
@@ -269,7 +274,8 @@ public class MinecraftGameProvider implements GameProvider {
 			realmsJar = obfJars.get("realms");
 		}
 
-		if (!logJars.isEmpty()) {
+		// Load the logger libraries on the platform CL when in a unit test
+		if (!logJars.isEmpty() && !Boolean.getBoolean(SystemProperties.UNIT_TEST)) {
 			for (Path jar : logJars) {
 				if (gameJars.contains(jar)) {
 					launcher.addToClassPath(jar, ALLOWED_EARLY_CLASS_PREFIXES);
@@ -281,7 +287,7 @@ public class MinecraftGameProvider implements GameProvider {
 
 		setupLogHandler(launcher, true);
 
-		TRANSFORMER.locateEntrypoints(launcher, gameJars);
+		transformer.locateEntrypoints(launcher, gameJars);
 	}
 
 	private void setupLogHandler(PunchLauncher launcher, boolean useTargetCl) {
@@ -348,7 +354,7 @@ public class MinecraftGameProvider implements GameProvider {
 
 	@Override
 	public GameTransformer getEntrypointTransformer() {
-		return TRANSFORMER;
+		return transformer;
 	}
 
 	@Override
