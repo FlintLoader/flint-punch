@@ -46,7 +46,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 
 	public static final int ASM_VERSION = Opcodes.ASM9;
 
-	public static final String VERSION = "0.0.1";
+	public static final String VERSION = "0.0.2";
 
 	public static final String CACHE_DIR_NAME = ".punch"; // relative to game dir
 	public static final String REMAPPED_JARS_DIR_NAME = "remappedJars"; // relative to cache dir
@@ -178,7 +178,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 			if (modContainer.isBuiltIn()) continue;
 
 			String accessWidener = modContainer.getAccessWidener();
-			if (accessWidener == null) continue;
+			if (accessWidener == null || accessWidener.isEmpty()) continue;
 
 			Path path = modContainer.findPath(accessWidener).orElse(null);
 			if (path == null) throw new RuntimeException(String.format("Missing accessWidener file %s from module %s", accessWidener, modContainer.getId()));
