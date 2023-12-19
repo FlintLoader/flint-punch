@@ -16,12 +16,15 @@
 **/
 package net.flintloader.punch.impl.game.minecraft.patch;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.flintloader.punch.impl.game.patch.GamePatch;
 import net.flintloader.punch.impl.launch.PunchLauncher;
 import net.flintloader.punch.impl.launch.punch.Punch;
+import net.flintloader.punch.impl.util.LoaderUtil;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 import org.objectweb.asm.ClassReader;
@@ -36,7 +39,7 @@ public class EntrypointPatchFML125 extends GamePatch {
 	private static final String TO_INTERNAL = "cpw/mods/fml/common/ModClassLoader";
 
 	@Override
-	public void process(PunchLauncher launcher, Function<String, ClassReader> classSource, Consumer<ClassNode> classEmitter) {
+	public void process(PunchLauncher launcher, Function<String, ClassNode> classSource, Consumer<ClassNode> classEmitter) {
 		if (classSource.apply(TO) != null
 				&& classSource.apply("cpw.mods.fml.relauncher.FMLRelauncher") == null) {
 			if (!(launcher instanceof Punch)) {
@@ -45,7 +48,20 @@ public class EntrypointPatchFML125 extends GamePatch {
 
 			Log.debug(LogCategory.GAME_PATCH, "Detected 1.2.5 FML - Punching ModClassLoader...");
 
-			ClassNode patchedClassLoader = readClass(classSource.apply(FROM));
+			// ModClassLoader_125_FML isn't in the game's class path, so it's loaded from the launcher's class path instead
+			ClassNode patchedClassLoader = new ClassNode();
+
+			try (InputStream stream = launcher.getResourceAsStream(LoaderUtil.getClassFileName(FROM))) {
+				if (stream != null) {
+					ClassReader patchedClassLoaderReader = new ClassReader(stream);
+					patchedClassLoaderReader.accept(patchedClassLoader, 0);
+				} else {
+					throw new IOException("Could not find class " + FROM + " in the launcher classpath while transforming ModClassLoader");
+				}
+			} catch (IOException e) {
+				throw new RuntimeException("An error occurred while reading class " + FROM + " while transforming ModClassLoader", e);
+			}
+
 			ClassNode remappedClassLoader = new ClassNode();
 
 			patchedClassLoader.accept(new ClassRemapper(remappedClassLoader, new Remapper() {
