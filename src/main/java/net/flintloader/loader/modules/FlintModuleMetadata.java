@@ -31,25 +31,25 @@ public final class FlintModuleMetadata {
 
 	private transient boolean builtIn = false;
 
-	private @NotNull final String id;
-	private @NotNull final String version;
-	private @NotNull final String name;
-	private @Nullable String description;
-	private final @NotNull List<String> authors = new ArrayList<>();
-	private @Nullable String license;
-	private @Nullable String icon;
-	private final @NotNull List<String> mixins = new ArrayList<>();
-	private @Nullable String accessWidener;
-	private @NotNull final HashMap<String, String> contact = new HashMap<>();
-	private @NotNull final HashMap<String, String> depends = new HashMap<>();
-	private @NotNull final HashMap<String, String> breaks = new HashMap<>();
-	private @NotNull final HashMap<String, String> entryPoints = new HashMap<>();
+	private String id;
+	private String version;
+	private String name;
+	private String description;
+	private List<String> authors;
+	private String license;
+	private String icon;
+	private List<String> mixins;
+	private String accessWidener;
+	private HashMap<String, String> contact = new HashMap<>();
+	private HashMap<String, String> depends = new HashMap<>();
+	private HashMap<String, String> breaks = new HashMap<>();
+	private HashMap<String, String> entryPoints = new HashMap<>();
 
-	FlintModuleMetadata(@NotNull String id, @NotNull String name, @NotNull String version) {
+	FlintModuleMetadata(String id, String name, String version) {
 		this(id, name, version, false);
 	}
 
-	FlintModuleMetadata(@NotNull String id, @NotNull String name, @NotNull String version, boolean builtIn) {
+	FlintModuleMetadata(String id, String name, String version, boolean builtIn) {
 		this.id = id;
 		this.name = name;
 		this.version = version;
@@ -61,63 +61,75 @@ public final class FlintModuleMetadata {
 		return builtIn || id.equals("flintloader");
 	}
 
-	public @NotNull String getId() {
-		return id;
+	public String getId() {
+		return id == null ? "" : id;
 	}
 
-	public @NotNull String getVersion() {
-		return version;
+	public String getVersion() {
+		return version == null ? "0.0.0" : version;
 	}
 
-	public @NotNull String getName() {
-		return name;
+	public String getName() {
+		return name == null ? "Unknown Module" : name;
 	}
 
-	@Nullable
 	public String getDescription() {
-		return description;
+		return description == null ? "" : description;
 	}
 
-	public @NotNull List<String> getAuthors() {
+	public List<String> getAuthors() {
+		if (authors == null) {
+			return new ArrayList<>();
+		}
 		return authors;
 	}
 
-	@Nullable
 	public String getLicense() {
-		return license;
+		return license == null ? "" : license;
 	}
 
-	@Nullable
 	public String getIcon() {
-		return icon;
+		return icon == null ? "" : icon;
 	}
 
-	public @NotNull List<String> getMixins() {
+	public List<String> getMixins() {
+		if (mixins == null) {
+			return new ArrayList<>();
+		}
 		return mixins;
 	}
 
-	@Nullable
 	public String getAccessWidener() {
-		return accessWidener;
+		return accessWidener == null ? "" : accessWidener;
 	}
 
-	public @NotNull HashMap<String, String> getContact() {
+	public HashMap<String, String> getContact() {
+		if (contact == null) {
+			return new HashMap<>();
+		}
 		return contact;
 	}
 
-	public @NotNull HashMap<String, String> getDepends() {
+	public HashMap<String, String> getDepends() {
+		if (depends == null) {
+			return new HashMap<>();
+		}
 		return depends;
 	}
 
-	public @NotNull HashMap<String, String> getBreaks() {
+	public HashMap<String, String> getBreaks() {
+		if (breaks == null) {
+			return new HashMap<>();
+		}
 		return breaks;
 	}
 
-	public @NotNull HashMap<String, String> getEntryPoints() {
+	public HashMap<String, String> getEntryPoints() {
+		if (entryPoints == null)
+			return new HashMap<>();
 		return entryPoints;
 	}
 
-	@NotNull
 	public Optional<String> getEntryPoint(String type) {
 		if (entryPoints.containsKey(type)) {
 			return Optional.of(entryPoints.get(type));
