@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.flintloader.loader.api.ModuleContainer;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
@@ -40,7 +41,7 @@ public class ModuleResolver {
 		}
 	}
 
-	public void resolve(Map<String, FlintModuleMetadata> outList) {
+	public void resolve(Map<String, ModuleContainer> outList) {
 		resolvers.forEach(resolver -> resolver.resolve(outList));
 	}
 

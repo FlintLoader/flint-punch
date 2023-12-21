@@ -25,12 +25,10 @@ import java.util.Optional;
 
 /**
  * @author HypherionSA
- * @date 21/06/2022
  */
 public class FlintModuleMetadata {
 
 	private transient boolean builtIn = false;
-	private transient Path source;
 
 	private String id;
 	private String version;
@@ -41,11 +39,10 @@ public class FlintModuleMetadata {
 	private String icon;
 	private List<String> mixins;
 	private String accessWidener;
-
-	private String entryPoint;
 	private HashMap<String, String> contact = new HashMap<>();
 	private HashMap<String, String> depends = new HashMap<>();
 	private HashMap<String, String> breaks = new HashMap<>();
+	private HashMap<String, String> entryPoints = new HashMap<>();
 
 	FlintModuleMetadata(String id, String name, String version) {
 		this(id, name, version, false);
@@ -126,21 +123,16 @@ public class FlintModuleMetadata {
 		return breaks;
 	}
 
-	public Path getSource() {
-		return source;
+	public HashMap<String, String> getEntryPoints() {
+		if (entryPoints == null)
+			return new HashMap<>();
+		return entryPoints;
 	}
 
-	public void setSource(Path path) {
-		this.source = path;
-	}
-
-	public String getEntryPoint() {
-		return entryPoint;
-	}
-
-	public Optional<Path> findPath(String file) {
-		Path path = getSource().resolve(file.replace("/", getSource().getFileSystem().getSeparator()));
-		if (Files.exists(path)) return Optional.of(path);
+	public Optional<String> getEntryPoint(String type) {
+		if (entryPoints.containsKey(type)) {
+			return Optional.of(entryPoints.get(type));
+		}
 		return Optional.empty();
 	}
 }

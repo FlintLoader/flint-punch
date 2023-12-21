@@ -16,6 +16,7 @@
 **/
 package net.flintloader.loader.core;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.vdurmont.semver4j.Semver;
 import net.flintloader.loader.api.FlintModule;
+import net.flintloader.loader.api.ModuleContainer;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.loader.modules.Strings;
@@ -56,10 +58,12 @@ public final class FlintLoader {
 	public static void finishModuleSetup() {
 		checkDependencies();
 
-		for (FlintModuleMetadata module : ModuleList.getInstance().allModules()) {
-			if (!module.isBuiltIn()) {
-				if (!module.getId().equalsIgnoreCase("flintloader")) {
-					PunchLauncherBase.getLauncher().addToClassPath(LoaderUtil.normalizePath(module.getSource()));
+		for (ModuleContainer module : ModuleList.getInstance().allModules()) {
+			if (!module.getMetadata().isBuiltIn()) {
+				if (!module.getMetadata().getId().equalsIgnoreCase("flintloader")) {
+					for (Path p : module.getRootPaths()) {
+						PunchLauncherBase.getLauncher().addToClassPath(LoaderUtil.normalizePath(p));
+					}
 				}
 			}
 		}
@@ -72,7 +76,8 @@ public final class FlintLoader {
 		List<String> missing = new ArrayList<>();
 		List<String> invalid = new ArrayList<>();
 
-		for (FlintModuleMetadata meta : ModuleList.getInstance().allModules()) {
+		for (ModuleContainer container : ModuleList.getInstance().allModules()) {
+			FlintModuleMetadata meta = container.getMetadata();
 
 			/* Check for required modules */
 			if (!meta.isBuiltIn()) {
@@ -81,7 +86,7 @@ public final class FlintLoader {
 						if (!ModuleList.getInstance().isModuleLoaded(depId)) {
 							missing.add(Strings.MISSING_DEP.resolve(meta.getId(), depId));
 						} else {
-							FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depId);
+							FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depId).getMetadata();
 							Semver depVer = new Semver(metadata.getVersion(), Semver.SemverType.COCOAPODS);
 							if (!depVer.satisfies(depVersion)) {
 								String errType = depVer.isGreaterThan(depVersion) ? "greater than" : "less than";
@@ -95,7 +100,7 @@ public final class FlintLoader {
 				if (meta.getBreaks() != null) {
 					meta.getBreaks().forEach((depid, depVersion) -> {
 						if (ModuleList.getInstance().isModuleLoaded(depid)) {
-							FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depid);
+							FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depid).getMetadata();
 							Semver depVer = new Semver(metadata.getVersion(), Semver.SemverType.COCOAPODS);
 							if (depVer.satisfies(depVersion)) {
 								String errType = depVer.isGreaterThan(depVersion) ? "greater than" : "less than";
@@ -140,12 +145,14 @@ public final class FlintLoader {
 	 * Discover declared entry points from modules
 	 */
 	public static void gatherEntryPoints() {
-		for (FlintModuleMetadata metadata : ModuleList.getInstance().allModules()) {
-			if (metadata.isBuiltIn() || metadata.getEntryPoint() == null)
+		for (ModuleContainer container : ModuleList.getInstance().allModules()) {
+			FlintModuleMetadata metadata = container.getMetadata();
+
+			if (metadata.isBuiltIn() || !metadata.getEntryPoint("main").isPresent())
 				continue;
 
 			try {
-				Class<?> clazz = EntryPointUtil.getClass(metadata.getEntryPoint());
+				Class<?> clazz = EntryPointUtil.getClass(metadata.getEntryPoint("main").get());
 				entryPoints.put(metadata.getId(), (FlintModule) EntryPointUtil.createInstance(clazz));
 			} catch (Exception e) {
 				Log.error(LogCategory.ENTRYPOINT, "Failed to discover entry points for '" + metadata.getId() + "'", e);

@@ -24,6 +24,7 @@ import java.nio.file.Path;
 
 import net.fabricmc.accesswidener.AccessWidenerReader;
 
+import net.flintloader.loader.api.ModuleContainer;
 import net.flintloader.loader.core.FlintLoader;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
@@ -46,7 +47,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 
 	public static final int ASM_VERSION = Opcodes.ASM9;
 
-	public static final String VERSION = "0.0.2";
+	public static final String VERSION = "0.0.3";
 
 	public static final String CACHE_DIR_NAME = ".punch"; // relative to game dir
 	public static final String REMAPPED_JARS_DIR_NAME = "remappedJars"; // relative to cache dir
@@ -174,19 +175,19 @@ public final class PunchLoaderImpl extends PunchLoader {
 		// TODO ACCESS WIDENERS
 		AccessWidenerReader accessWidenerReader = new AccessWidenerReader(accessWidener);
 
-		for (FlintModuleMetadata modContainer : ModuleList.getInstance().allModules()) {
-			if (modContainer.isBuiltIn()) continue;
+		for (ModuleContainer modContainer : ModuleList.getInstance().allModules()) {
+			if (modContainer.getMetadata().isBuiltIn()) continue;
 
-			String accessWidener = modContainer.getAccessWidener();
+			String accessWidener = modContainer.getMetadata().getAccessWidener();
 			if (accessWidener == null || accessWidener.isEmpty()) continue;
 
 			Path path = modContainer.findPath(accessWidener).orElse(null);
-			if (path == null) throw new RuntimeException(String.format("Missing accessWidener file %s from module %s", accessWidener, modContainer.getId()));
+			if (path == null) throw new RuntimeException(String.format("Missing accessWidener file %s from module %s", accessWidener, modContainer.getMetadata().getId()));
 
 			try (BufferedReader reader = Files.newBufferedReader(path)) {
 				accessWidenerReader.read(reader, getMappingResolver().getCurrentRuntimeNamespace());
 			} catch (Exception e) {
-				throw new RuntimeException("Failed to read accessWidener file from mod " + modContainer.getId(), e);
+				throw new RuntimeException("Failed to read accessWidener file from mod " + modContainer.getMetadata().getId(), e);
 			}
 		}
 	}

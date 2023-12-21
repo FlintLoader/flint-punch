@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.flintloader.loader.api.ModuleContainer;
 import net.flintloader.loader.modules.resolver.ModuleResolver;
 import net.flintloader.loader.modules.resolver.impl.ClassPathModuleResolver;
 import net.flintloader.loader.modules.resolver.impl.DirectoryModuleResolver;
@@ -37,7 +38,7 @@ public class ModuleList {
 	private static ModuleList instance;
 	private final ModuleResolver moduleResolver = new ModuleResolver();
 
-    private final Map<String, FlintModuleMetadata> MODULES = new HashMap<>();
+    private final Map<String, ModuleContainer> MODULES = new HashMap<>();
 
 	public static ModuleList getInstance() {
 		if (instance == null) {
@@ -55,13 +56,15 @@ public class ModuleList {
 		Log.info(LogCategory.DISCOVERY, "Discovered " + MODULES.size() + " modules");
 
 		FlintModuleMetadata mc = new FlintModuleMetadata("minecraft", "Minecraft", PunchLoaderImpl.INSTANCE.getGameProvider().getRawGameVersion(), true);
-		MODULES.put("minecraft", mc);
+		ModuleContainerImpl mcContainer = new ModuleContainerImpl(mc, new ArrayList<>(), new ModuleOriginImpl(new ArrayList<>()));
+		MODULES.put("minecraft", mcContainer);
 
 		FlintModuleMetadata java = new FlintModuleMetadata("java", "Java", System.getProperty("java.version"), true);
-		MODULES.put("java", java);
+		ModuleContainerImpl javaContainer = new ModuleContainerImpl(java, new ArrayList<>(), new ModuleOriginImpl(new ArrayList<>()));
+		MODULES.put("java", javaContainer);
     }
 
-	public List<FlintModuleMetadata> allModules() {
+	public List<ModuleContainer> allModules() {
 		return new ArrayList<>(MODULES.values());
 	}
 
@@ -70,10 +73,10 @@ public class ModuleList {
 	}
 
 	public int getModuleCount() {
-		return (int) MODULES.values().stream().map(m -> !m.isBuiltIn()).count();
+		return (int) MODULES.values().stream().map(m -> !m.getMetadata().isBuiltIn()).count();
 	}
 
-	public FlintModuleMetadata getModuleMeta(String id) {
+	public ModuleContainer getModuleMeta(String id) {
 		if (MODULES.containsKey(id)) {
 			return MODULES.get(id);
 		}

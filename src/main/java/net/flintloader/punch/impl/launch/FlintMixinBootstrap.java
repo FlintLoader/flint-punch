@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.flintloader.loader.api.ModuleContainer;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.punch.impl.PunchLoaderImpl;
@@ -77,7 +78,8 @@ public final class FlintMixinBootstrap {
 
 		Map<String, FlintModuleMetadata> configToModuleMap = new HashMap<>();
 
-		for (FlintModuleMetadata module : ModuleList.getInstance().allModules()) {
+		for (ModuleContainer container : ModuleList.getInstance().allModules()) {
+			FlintModuleMetadata module = container.getMetadata();
 			if (!module.isBuiltIn()) {
 				for (String config : module.getMixins()) {
 					FlintModuleMetadata prev = configToModuleMap.putIfAbsent(config, module);
