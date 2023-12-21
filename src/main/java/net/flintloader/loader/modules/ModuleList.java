@@ -21,24 +21,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.flintloader.loader.api.ModuleContainer;
-import net.flintloader.loader.modules.resolver.ModuleResolver;
+import net.flintloader.loader.api.FlintModuleContainer;
+import net.flintloader.loader.modules.resolver.ModuleResolvers;
 import net.flintloader.loader.modules.resolver.impl.ClassPathModuleResolver;
 import net.flintloader.loader.modules.resolver.impl.DirectoryModuleResolver;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author HypherionSA
- * @date 21/06/2022
  */
-public class ModuleList {
+public final class ModuleList {
 
 	private static ModuleList instance;
-	private final ModuleResolver moduleResolver = new ModuleResolver();
+	private final ModuleResolvers moduleResolvers = new ModuleResolvers();
 
-    private final Map<String, ModuleContainer> MODULES = new HashMap<>();
+    private final Map<String, FlintModuleContainer> MODULES = new HashMap<>();
 
 	public static ModuleList getInstance() {
 		if (instance == null) {
@@ -49,22 +49,22 @@ public class ModuleList {
 
 	public void discoverModules() {
 		Log.info(LogCategory.DISCOVERY, "Discovering Modules...");
-		moduleResolver.addResolver(new ClassPathModuleResolver());
-		moduleResolver.addResolver(new DirectoryModuleResolver());
-		moduleResolver.resolve(MODULES);
+		moduleResolvers.addResolver(new ClassPathModuleResolver());
+		moduleResolvers.addResolver(new DirectoryModuleResolver());
+		moduleResolvers.resolve(MODULES);
 
 		Log.info(LogCategory.DISCOVERY, "Discovered " + MODULES.size() + " modules");
 
 		FlintModuleMetadata mc = new FlintModuleMetadata("minecraft", "Minecraft", PunchLoaderImpl.INSTANCE.getGameProvider().getRawGameVersion(), true);
-		ModuleContainerImpl mcContainer = new ModuleContainerImpl(mc, new ArrayList<>(), new ModuleOriginImpl(new ArrayList<>()));
+		FlintModuleContainerImpl mcContainer = new FlintModuleContainerImpl(mc, new ArrayList<>(), new ModuleOriginImpl(new ArrayList<>()));
 		MODULES.put("minecraft", mcContainer);
 
 		FlintModuleMetadata java = new FlintModuleMetadata("java", "Java", System.getProperty("java.version"), true);
-		ModuleContainerImpl javaContainer = new ModuleContainerImpl(java, new ArrayList<>(), new ModuleOriginImpl(new ArrayList<>()));
+		FlintModuleContainerImpl javaContainer = new FlintModuleContainerImpl(java, new ArrayList<>(), new ModuleOriginImpl(new ArrayList<>()));
 		MODULES.put("java", javaContainer);
     }
 
-	public List<ModuleContainer> allModules() {
+	public List<FlintModuleContainer> allModules() {
 		return new ArrayList<>(MODULES.values());
 	}
 
@@ -76,9 +76,18 @@ public class ModuleList {
 		return (int) MODULES.values().stream().map(m -> !m.getMetadata().isBuiltIn()).count();
 	}
 
-	public ModuleContainer getModuleMeta(String id) {
+	@Nullable
+	public FlintModuleContainer getModuleContainer(String id) {
 		if (MODULES.containsKey(id)) {
 			return MODULES.get(id);
+		}
+		return null;
+	}
+
+	@Nullable
+	public FlintModuleMetadata getModuleMeta(String id) {
+		if (MODULES.containsKey(id)) {
+			return MODULES.get(id).getMetadata();
 		}
 		return null;
 	}

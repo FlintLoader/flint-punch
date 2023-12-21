@@ -25,7 +25,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.vdurmont.semver4j.Semver;
 import net.flintloader.loader.api.FlintModule;
-import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.FlintModuleContainer;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.loader.modules.Strings;
@@ -34,15 +34,18 @@ import net.flintloader.punch.impl.launch.PunchLauncherBase;
 import net.flintloader.punch.impl.util.LoaderUtil;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @author HypherionSA
- * @date 23/06/2022
  * Internal Hooks to handle module loading and registering
  */
-public final class FlintLoader {
+@ApiStatus.Internal
+public final class PunchLauncherHooks {
 
 	public static final Gson gson = new Gson();
+
+	// TODO Move this to a separate handler, to allow custom entry points
 	private static final Map<String, FlintModule> entryPoints = new HashMap<>();
 
 	/**
@@ -58,7 +61,7 @@ public final class FlintLoader {
 	public static void finishModuleSetup() {
 		checkDependencies();
 
-		for (ModuleContainer module : ModuleList.getInstance().allModules()) {
+		for (FlintModuleContainer module : ModuleList.getInstance().allModules()) {
 			if (!module.getMetadata().isBuiltIn()) {
 				if (!module.getMetadata().getId().equalsIgnoreCase("flintloader")) {
 					for (Path p : module.getRootPaths()) {
@@ -76,39 +79,41 @@ public final class FlintLoader {
 		List<String> missing = new ArrayList<>();
 		List<String> invalid = new ArrayList<>();
 
-		for (ModuleContainer container : ModuleList.getInstance().allModules()) {
+		for (FlintModuleContainer container : ModuleList.getInstance().allModules()) {
 			FlintModuleMetadata meta = container.getMetadata();
 
 			/* Check for required modules */
 			if (!meta.isBuiltIn()) {
-				if (meta.getDepends() != null) {
-					meta.getDepends().forEach((depId, depVersion) -> {
-						if (!ModuleList.getInstance().isModuleLoaded(depId)) {
-							missing.add(Strings.MISSING_DEP.resolve(meta.getId(), depId));
-						} else {
-							FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depId).getMetadata();
-							Semver depVer = new Semver(metadata.getVersion(), Semver.SemverType.COCOAPODS);
-							if (!depVer.satisfies(depVersion)) {
-								String errType = depVer.isGreaterThan(depVersion) ? "greater than" : "less than";
-								invalid.add(Strings.WRONG_DEP_VERSION.resolve(meta.getId(), errType, depVersion, depVer.getOriginalValue()));
-							}
+				meta.getDepends().forEach((depId, depVersion) -> {
+					if (!ModuleList.getInstance().isModuleLoaded(depId)) {
+						missing.add(Strings.MISSING_DEP.resolve(meta.getId(), depId));
+					} else {
+						FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depId);
+						if (metadata == null)
+							return;
+
+						Semver depVer = new Semver(metadata.getVersion(), Semver.SemverType.COCOAPODS);
+						if (!depVer.satisfies(depVersion)) {
+							String errType = depVer.isGreaterThan(depVersion) ? "greater than" : "less than";
+							invalid.add(Strings.WRONG_DEP_VERSION.resolve(meta.getId(), errType, depVersion, depVer.getOriginalValue()));
 						}
-					});
-				}
+					}
+				});
 
 				/* Check for breaking modules */
-				if (meta.getBreaks() != null) {
-					meta.getBreaks().forEach((depid, depVersion) -> {
-						if (ModuleList.getInstance().isModuleLoaded(depid)) {
-							FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depid).getMetadata();
-							Semver depVer = new Semver(metadata.getVersion(), Semver.SemverType.COCOAPODS);
-							if (depVer.satisfies(depVersion)) {
-								String errType = depVer.isGreaterThan(depVersion) ? "greater than" : "less than";
-								invalid.add(Strings.BREAKS.resolve(meta.getId(), errType, depVersion, depVer.getOriginalValue()));
-							}
+				meta.getBreaks().forEach((depid, depVersion) -> {
+					if (ModuleList.getInstance().isModuleLoaded(depid)) {
+						FlintModuleMetadata metadata = ModuleList.getInstance().getModuleMeta(depid);
+						if (metadata == null)
+							return;
+
+						Semver depVer = new Semver(metadata.getVersion(), Semver.SemverType.COCOAPODS);
+						if (depVer.satisfies(depVersion)) {
+							String errType = depVer.isGreaterThan(depVersion) ? "greater than" : "less than";
+							invalid.add(Strings.BREAKS.resolve(meta.getId(), errType, depVersion, depVer.getOriginalValue()));
 						}
-					});
-				}
+					}
+				});
 			}
 		}
 
@@ -145,7 +150,7 @@ public final class FlintLoader {
 	 * Discover declared entry points from modules
 	 */
 	public static void gatherEntryPoints() {
-		for (ModuleContainer container : ModuleList.getInstance().allModules()) {
+		for (FlintModuleContainer container : ModuleList.getInstance().allModules()) {
 			FlintModuleMetadata metadata = container.getMetadata();
 
 			if (metadata.isBuiltIn() || !metadata.getEntryPoint("main").isPresent())

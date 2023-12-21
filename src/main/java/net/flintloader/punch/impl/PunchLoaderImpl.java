@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.flintloader.loader.api.ModuleContainer;
-import net.flintloader.loader.core.FlintLoader;
+import net.flintloader.loader.api.FlintModuleContainer;
+import net.flintloader.loader.core.PunchLauncherHooks;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.punch.PunchLoader;
 import net.flintloader.punch.api.MappingResolver;
@@ -74,7 +74,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 		}
 
 		frozen = true;
-		FlintLoader.finishModuleSetup();
+		PunchLauncherHooks.finishModuleSetup();
 	}
 
 	public GameProvider getGameProvider() {
@@ -144,7 +144,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 	public void load() {
 		if (provider == null) throw new IllegalStateException("game provider not set");
 		if (frozen) throw new IllegalStateException("Frozen - cannot load additional mods!");
-		FlintLoader.discoverModules();
+		PunchLauncherHooks.discoverModules();
 	}
 
 	@Override
@@ -170,10 +170,9 @@ public final class PunchLoaderImpl extends PunchLoader {
 	}
 
 	public void loadAccessWideners() {
-		// TODO ACCESS WIDENERS
 		AccessWidenerReader accessWidenerReader = new AccessWidenerReader(accessWidener);
 
-		for (ModuleContainer modContainer : ModuleList.getInstance().allModules()) {
+		for (FlintModuleContainer modContainer : ModuleList.getInstance().allModules()) {
 			if (modContainer.getMetadata().isBuiltIn()) continue;
 
 			String accessWidener = modContainer.getMetadata().getAccessWidener();
@@ -190,7 +189,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 		}
 	}
 
-	public void prepareModInit(Path newRunDir, Object gameInstance) {
+	public void prepareModuleInit(Path newRunDir, Object gameInstance) {
 		if (!frozen) {
 			throw new RuntimeException("Cannot instantiate mods when not frozen!");
 		}
@@ -244,7 +243,7 @@ public final class PunchLoaderImpl extends PunchLoader {
 			setGameDir(newRunDir);
 		}
 
-		FlintLoader.gatherEntryPoints();
+		PunchLauncherHooks.gatherEntryPoints();
 	}
 
 	public AccessWidener getAccessWidener() {

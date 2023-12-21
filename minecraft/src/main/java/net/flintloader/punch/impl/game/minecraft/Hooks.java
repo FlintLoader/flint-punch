@@ -18,7 +18,7 @@ package net.flintloader.punch.impl.game.minecraft;
 
 import java.io.File;
 
-import net.flintloader.loader.core.FlintLoader;
+import net.flintloader.loader.core.PunchLauncherHooks;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
@@ -45,8 +45,8 @@ public final class Hooks {
 			runDir = new File(".");
 		}
 
-		PunchLoaderImpl.INSTANCE.prepareModInit(runDir.toPath(), gameInstance);
-		FlintLoader.initializeModules();
+		PunchLoaderImpl.INSTANCE.prepareModuleInit(runDir.toPath(), gameInstance);
+		PunchLauncherHooks.initializeModules();
 	}
 
 	public static void setGameInstance(Object gameInstance) {

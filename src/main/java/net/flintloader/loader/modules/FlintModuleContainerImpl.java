@@ -26,21 +26,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.FlintModuleContainer;
 import net.flintloader.loader.api.ModuleOrigin;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.util.FileSystemUtil;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 
-public class ModuleContainerImpl implements ModuleContainer {
+public final class FlintModuleContainerImpl implements FlintModuleContainer {
 
 	private final FlintModuleMetadata meta;
 	private final List<Path> paths;
 	private List<Path> rootPaths;
 	private final ModuleOrigin origin;
 
-	public ModuleContainerImpl(FlintModuleMetadata meta, List<Path> paths, ModuleOrigin origin) {
+	public FlintModuleContainerImpl(FlintModuleMetadata meta, List<Path> paths, ModuleOrigin origin) {
 		this.meta = meta;
 		this.paths = paths;
 		this.origin = origin;
@@ -50,8 +50,6 @@ public class ModuleContainerImpl implements ModuleContainer {
 	public FlintModuleMetadata getMetadata() {
 		return meta;
 	}
-
-	private static boolean warnedMultiPath = false;
 
 	@Override
 	public List<Path> getRootPaths() {
@@ -87,13 +85,13 @@ public class ModuleContainerImpl implements ModuleContainer {
 	}
 
 	@Override
-	public Optional<ModuleContainer> getContainingModule() {
+	public Optional<FlintModuleContainer> getContainingModule() {
 		// TODO Support Nested Modules
 		return Optional.empty();
 	}
 
 	@Override
-	public Collection<ModuleContainer> getContainedModules() {
+	public Collection<FlintModuleContainer> getContainedModules() {
 		// TODO Support Nested Modules
 		return new ArrayList<>();
 	}

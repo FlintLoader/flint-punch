@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import net.flintloader.loader.core.FlintLoader;
+import net.flintloader.loader.core.PunchLauncherHooks;
 import net.flintloader.punch.impl.FormattedException;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.game.GameProvider;
@@ -48,7 +48,7 @@ import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 
 public final class Punch extends PunchLauncherBase {
-	protected Map<String, Object> properties = new HashMap<>();
+	private final Map<String, Object> properties = new HashMap<>();
 
 	private PunchClassLoaderInterface classLoader;
 	private boolean isDevelopment;
@@ -73,7 +73,7 @@ public final class Punch extends PunchLauncherBase {
 		}
 	}
 
-	protected ClassLoader init(String[] args) {
+	private ClassLoader init(String[] args) {
 		setProperties(properties);
 
 		classPath.clear();
@@ -109,7 +109,6 @@ public final class Punch extends PunchLauncherBase {
 		isDevelopment = Boolean.parseBoolean(System.getProperty(SystemProperties.DEVELOPMENT, "false"));
 
 		// Setup classloader
-		// TODO: Provide PunchCompatibilityClassLoader in non-exclusive-Fabric pre-1.13 environments?
 		boolean useCompatibility = provider.requiresUrlClassLoader() || Boolean.parseBoolean(System.getProperty("flint.loader.useCompatibilityClassLoader", "false"));
 		classLoader = PunchClassLoaderInterface.create(useCompatibility, isDevelopment(), provider);
 		ClassLoader cl = classLoader.getClassLoader();
@@ -133,7 +132,7 @@ public final class Punch extends PunchLauncherBase {
 		provider.unlockClassPath(this);
 		unlocked = true;
 
-		FlintLoader.earlyInitModules();
+		PunchLauncherHooks.earlyInitModules();
 
 		return cl;
 	}
@@ -196,7 +195,7 @@ public final class Punch extends PunchLauncherBase {
 			if (flPath == null || !flPath.getFileName().toString().endsWith(".jar")) return null; // not a jar
 
 			try (ZipFile zf = new ZipFile(flPath.toFile())) {
-				ZipEntry entry = zf.getEntry("META-INF/services/game.impl.net.flintloader.punch.GameProvider"); // same file as used by service loader
+				ZipEntry entry = zf.getEntry("META-INF/services/net.flintloader.punch.impl.game.GameProvider"); // same file as used by service loader
 				if (entry == null) return null;
 
 				try (InputStream is = zf.getInputStream(entry)) {

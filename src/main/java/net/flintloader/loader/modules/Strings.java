@@ -18,7 +18,6 @@ package net.flintloader.loader.modules;
 
 /**
  * @author HypherionSA
- * @date 27/06/2022
  */
 public enum Strings {
 	MISSING_DEP("Module %s requires module %s, but it's not installed"),

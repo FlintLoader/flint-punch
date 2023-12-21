@@ -21,7 +21,7 @@ import java.util.List;
 
 import net.flintloader.loader.api.ModuleOrigin;
 
-public class ModuleOriginImpl implements ModuleOrigin {
+public final class ModuleOriginImpl implements ModuleOrigin {
 
 	private final List<Path> paths;
 

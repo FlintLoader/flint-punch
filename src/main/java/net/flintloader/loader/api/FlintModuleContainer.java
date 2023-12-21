@@ -24,7 +24,11 @@ import java.util.Optional;
 
 import net.flintloader.loader.modules.FlintModuleMetadata;
 
-public interface ModuleContainer {
+/**
+ * @author HypherionSA
+ * Helper class for Loaded Modules for things such as file loading
+ */
+public interface FlintModuleContainer {
 
 	FlintModuleMetadata getMetadata();
 
@@ -41,8 +45,8 @@ public interface ModuleContainer {
 
 	ModuleOrigin getOrigin();
 
-	Optional<ModuleContainer> getContainingModule();
+	Optional<FlintModuleContainer> getContainingModule();
 
-	Collection<ModuleContainer> getContainedModules();
+	Collection<FlintModuleContainer> getContainedModules();
 
 }

@@ -19,6 +19,10 @@ package net.flintloader.loader.api;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * @author HypherionSA
+ * Representation of the various locations a module was loaded from originally
+ */
 public interface ModuleOrigin {
 
 	Kind getKind();

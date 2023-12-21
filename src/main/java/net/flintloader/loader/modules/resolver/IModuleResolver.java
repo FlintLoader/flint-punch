@@ -16,7 +16,7 @@
 **/
 package net.flintloader.loader.modules.resolver;
 
-import static net.flintloader.loader.core.FlintLoader.gson;
+import static net.flintloader.loader.core.PunchLauncherHooks.gson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,26 +26,24 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonParseException;
-import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.FlintModuleContainer;
+import net.flintloader.loader.modules.FlintModuleContainerImpl;
 import net.flintloader.loader.modules.FlintModuleMetadata;
-import net.flintloader.loader.modules.ModuleContainerImpl;
 import net.flintloader.loader.modules.ModuleOriginImpl;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 
 public interface IModuleResolver {
 
-	public void resolve(Map<String, ModuleContainer> outList);
+	void resolve(Map<String, FlintModuleContainer> outList);
 
-	default void readModuleJson(Map<String, ModuleContainer> outList, InputStream inputStream, List<Path> source) throws IOException {
+	default void readModuleJson(Map<String, FlintModuleContainer> outList, InputStream inputStream, List<Path> source) throws IOException {
 		try {
 			FlintModuleMetadata moduleContainer = gson.fromJson(new InputStreamReader(inputStream), FlintModuleMetadata.class);
-			ModuleContainerImpl container = new ModuleContainerImpl(moduleContainer, source, new ModuleOriginImpl(source));
+			FlintModuleContainerImpl container = new FlintModuleContainerImpl(moduleContainer, source, new ModuleOriginImpl(source));
 
-			if (moduleContainer.getId() == null) {
-				Log.error(LogCategory.DISCOVERY, "Module file " + moduleContainer.getName() + "'s flintmodule.json is missing an 'id' field");
-				return;
-			} else if (outList.containsKey(moduleContainer.getId())) {
+			if (outList.containsKey(moduleContainer.getId())) {
+				// TODO Duplicate Modid exception
 				//throw new DuplicateModException(modInfo, modInfoMap.get(modInfo.id));
 			}
 

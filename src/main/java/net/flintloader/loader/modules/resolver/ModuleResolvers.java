@@ -20,17 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.FlintModuleContainer;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
+import org.jetbrains.annotations.ApiStatus;
 
-public class ModuleResolver {
+@ApiStatus.Internal
+public final class ModuleResolvers {
 
-	private List<IModuleResolver> resolvers = new ArrayList<>();
+	private final List<IModuleResolver> resolvers = new ArrayList<>();
 
-	public ModuleResolver() {
-
-	}
+	public ModuleResolvers() {}
 
 	public void addResolver(IModuleResolver resolver) {
 		if (!resolvers.contains(resolver)) {
@@ -40,7 +40,7 @@ public class ModuleResolver {
 		}
 	}
 
-	public void resolve(Map<String, ModuleContainer> outList) {
+	public void resolve(Map<String, FlintModuleContainer> outList) {
 		resolvers.forEach(resolver -> resolver.resolve(outList));
 	}
 

@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.FlintModuleContainer;
 import net.flintloader.loader.modules.resolver.IModuleResolver;
 import net.flintloader.punch.impl.launch.PunchLauncherBase;
 import net.flintloader.punch.impl.util.LoaderUtil;
@@ -50,36 +50,37 @@ import net.flintloader.punch.impl.util.log.LogCategory;
 public final class ClassPathModuleResolver implements IModuleResolver {
 
 	@Override
-	public void resolve(Map<String, ModuleContainer> outList) {
-		if (PunchLauncherBase.getLauncher().isDevelopment()) {
-			Log.info(LogCategory.DISCOVERY, "Discovering Modules in Classpath...");
-			Map<Path, List<Path>> pathGroups = getPathGroups();
+	public void resolve(Map<String, FlintModuleContainer> outList) {
+		if (!PunchLauncherBase.getLauncher().isDevelopment())
+			return;
 
-			try {
-				Enumeration<URL> urlEnumeration = PunchLauncherBase.getLauncher().getTargetClassLoader().getResources("flintmodule.json");
+		Log.info(LogCategory.DISCOVERY, "Discovering Modules in Classpath...");
+		Map<Path, List<Path>> pathGroups = getPathGroups();
 
-				while (urlEnumeration.hasMoreElements()) {
-					URL url = urlEnumeration.nextElement();
+		try {
+			Enumeration<URL> urlEnumeration = PunchLauncherBase.getLauncher().getTargetClassLoader().getResources("flintmodule.json");
 
-					try {
-						Path path = LoaderUtil.normalizeExistingPath(UrlUtil.getCodeSource(url, "flintmodule.json"));
-						List<Path> paths = pathGroups.get(path);
-						InputStream in = url.openStream();
+			while (urlEnumeration.hasMoreElements()) {
+				URL url = urlEnumeration.nextElement();
 
-						if (paths == null) {
-							readModuleJson(outList, in, Collections.singletonList(path));
-						} else {
-							readModuleJson(outList, in, paths);
-						}
+				try {
+					Path path = LoaderUtil.normalizeExistingPath(UrlUtil.getCodeSource(url, "flintmodule.json"));
+					List<Path> paths = pathGroups.get(path);
+					InputStream in = url.openStream();
 
-					} catch (UrlConversionException e) {
-						Log.debug(LogCategory.DISCOVERY, "Error determining location for flintmodule.json from %s", url, e);
+					if (paths == null) {
+						readModuleJson(outList, in, Collections.singletonList(path));
+					} else {
+						readModuleJson(outList, in, paths);
 					}
-				}
 
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+				} catch (UrlConversionException e) {
+					Log.debug(LogCategory.DISCOVERY, "Error determining location for flintmodule.json from %s", url, e);
+				}
 			}
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

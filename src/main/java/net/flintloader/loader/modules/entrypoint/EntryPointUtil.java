@@ -16,6 +16,7 @@
 **/
 package net.flintloader.loader.modules.entrypoint;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +28,7 @@ import net.flintloader.punch.impl.util.LoaderUtil;
  * @author HypherionSA
  * Utility class to help with entry point creation
  */
-public class EntryPointUtil {
+public final class EntryPointUtil {
 
 	/**
 	 * Create a new instance of the Module Entrypoint class
@@ -52,9 +53,10 @@ public class EntryPointUtil {
 	 * @param className The name of the class, for example "com.minecraft.Main"
 	 * @return The class as loaded from the classpath
 	 */
-	public static Class<?> getClass(String className) throws ClassNotFoundException {
+	public static Class<?> getClass(String className) throws ClassNotFoundException, IOException {
 		InputStream stream = PunchLauncherBase.getLauncher().getResourceAsStream(LoaderUtil.getClassFileName(className));
 		if (stream == null) throw new ClassNotFoundException("Could not find or load class " + className);
+		stream.close();
 		return PunchLauncherBase.getClass(className);
 	}
 

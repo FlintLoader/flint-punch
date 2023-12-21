@@ -31,7 +31,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipException;
 
-import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.FlintModuleContainer;
 import net.flintloader.loader.modules.resolver.IModuleResolver;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
@@ -40,13 +40,13 @@ import net.flintloader.punch.impl.util.log.LogCategory;
  * @author HypherionSA
  * Load modules from the modules directory
  */
-public class DirectoryModuleResolver implements IModuleResolver {
+public final class DirectoryModuleResolver implements IModuleResolver {
 
 	private final File runDirectory = new File(".");
 	private final File modulesDirectory = new File(runDirectory, "modules");
 
 	@Override
-	public void resolve(Map<String, ModuleContainer> outList) {
+	public void resolve(Map<String, FlintModuleContainer> outList) {
 		Log.info(LogCategory.DISCOVERY, "Discovering Modules in Modules Directory...");
 		if (!modulesDirectory.exists()) {
 			modulesDirectory.mkdirs();

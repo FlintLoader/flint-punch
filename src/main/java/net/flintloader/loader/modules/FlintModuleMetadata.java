@@ -21,32 +21,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * @author HypherionSA
  */
-public class FlintModuleMetadata {
+public final class FlintModuleMetadata {
 
 	private transient boolean builtIn = false;
 
-	private String id;
-	private String version;
-	private String name;
-	private String description;
-	private List<String> authors;
-	private String license;
-	private String icon;
-	private List<String> mixins;
-	private String accessWidener;
-	private HashMap<String, String> contact = new HashMap<>();
-	private HashMap<String, String> depends = new HashMap<>();
-	private HashMap<String, String> breaks = new HashMap<>();
-	private HashMap<String, String> entryPoints = new HashMap<>();
+	private @NotNull final String id;
+	private @NotNull final String version;
+	private @NotNull final String name;
+	private @Nullable String description;
+	private final @NotNull List<String> authors = new ArrayList<>();
+	private @Nullable String license;
+	private @Nullable String icon;
+	private final @NotNull List<String> mixins = new ArrayList<>();
+	private @Nullable String accessWidener;
+	private @NotNull final HashMap<String, String> contact = new HashMap<>();
+	private @NotNull final HashMap<String, String> depends = new HashMap<>();
+	private @NotNull final HashMap<String, String> breaks = new HashMap<>();
+	private @NotNull final HashMap<String, String> entryPoints = new HashMap<>();
 
-	FlintModuleMetadata(String id, String name, String version) {
+	FlintModuleMetadata(@NotNull String id, @NotNull String name, @NotNull String version) {
 		this(id, name, version, false);
 	}
 
-	FlintModuleMetadata(String id, String name, String version, boolean builtIn) {
+	FlintModuleMetadata(@NotNull String id, @NotNull String name, @NotNull String version, boolean builtIn) {
 		this.id = id;
 		this.name = name;
 		this.version = version;
@@ -58,75 +61,63 @@ public class FlintModuleMetadata {
 		return builtIn || id.equals("flintloader");
 	}
 
-	public String getId() {
-		return id == null ? "" : id;
+	public @NotNull String getId() {
+		return id;
 	}
 
-	public String getVersion() {
-		return version == null ? "0.0.0" : version;
+	public @NotNull String getVersion() {
+		return version;
 	}
 
-	public String getName() {
-		return name == null ? "Unknown Module" : name;
+	public @NotNull String getName() {
+		return name;
 	}
 
+	@Nullable
 	public String getDescription() {
-		return description == null ? "" : description;
+		return description;
 	}
 
-	public List<String> getAuthors() {
-		if (authors == null) {
-			return new ArrayList<>();
-		}
+	public @NotNull List<String> getAuthors() {
 		return authors;
 	}
 
+	@Nullable
 	public String getLicense() {
-		return license == null ? "" : license;
+		return license;
 	}
 
+	@Nullable
 	public String getIcon() {
-		return icon == null ? "" : icon;
+		return icon;
 	}
 
-	public List<String> getMixins() {
-		if (mixins == null) {
-			return new ArrayList<>();
-		}
+	public @NotNull List<String> getMixins() {
 		return mixins;
 	}
 
+	@Nullable
 	public String getAccessWidener() {
-		return accessWidener == null ? "" : accessWidener;
+		return accessWidener;
 	}
 
-	public HashMap<String, String> getContact() {
-		if (contact == null) {
-			return new HashMap<>();
-		}
+	public @NotNull HashMap<String, String> getContact() {
 		return contact;
 	}
 
-	public HashMap<String, String> getDepends() {
-		if (depends == null) {
-			return new HashMap<>();
-		}
+	public @NotNull HashMap<String, String> getDepends() {
 		return depends;
 	}
 
-	public HashMap<String, String> getBreaks() {
-		if (breaks == null) {
-			return new HashMap<>();
-		}
+	public @NotNull HashMap<String, String> getBreaks() {
 		return breaks;
 	}
 
-	public HashMap<String, String> getEntryPoints() {
-		if (entryPoints == null)
-			return new HashMap<>();
+	public @NotNull HashMap<String, String> getEntryPoints() {
 		return entryPoints;
 	}
 
+	@NotNull
 	public Optional<String> getEntryPoint(String type) {
 		if (entryPoints.containsKey(type)) {
 			return Optional.of(entryPoints.get(type));
