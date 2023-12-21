@@ -10,7 +10,7 @@ This library is a fork of [fabric-loader](https://github.com/FabricMC/fabric-loa
 * Renamed all Fabric* classes and packages to avoid confusion
 * Stripped out all SERVER functionality as Flint Loader doesn't need it
 
-### This project is not associated or affiliated with FabricMC or the Fabric eco-system at all. IT WILL NOT ALLOW YOU TO RUN FABRIC MODS!
+### This project is not associated or affiliated with FabricMC or the Fabric ecosystem at all. IT WILL NOT ALLOW YOU TO RUN FABRIC MODS!
 
 ***
 

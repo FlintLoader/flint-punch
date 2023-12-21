@@ -22,11 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.fabricmc.accesswidener.AccessWidenerReader;
-
 import net.flintloader.loader.api.ModuleContainer;
 import net.flintloader.loader.core.FlintLoader;
-import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.punch.PunchLoader;
 import net.flintloader.punch.api.MappingResolver;
@@ -40,6 +37,7 @@ import net.flintloader.punch.impl.util.log.LogCategory;
 import org.objectweb.asm.Opcodes;
 
 import net.fabricmc.accesswidener.AccessWidener;
+import net.fabricmc.accesswidener.AccessWidenerReader;
 
 @SuppressWarnings("deprecation")
 public final class PunchLoaderImpl extends PunchLoader {

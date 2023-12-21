@@ -19,8 +19,6 @@ package net.flintloader.loader.modules.resolver.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,8 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.flintloader.loader.api.ModuleContainer;
-import net.flintloader.loader.modules.FlintModuleMetadata;
-import net.flintloader.loader.modules.ModuleContainerImpl;
 import net.flintloader.loader.modules.resolver.IModuleResolver;
 import net.flintloader.punch.impl.launch.PunchLauncherBase;
 import net.flintloader.punch.impl.util.LoaderUtil;

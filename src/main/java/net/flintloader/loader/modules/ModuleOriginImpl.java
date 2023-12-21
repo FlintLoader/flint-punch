@@ -16,10 +16,10 @@
 **/
 package net.flintloader.loader.modules;
 
-import net.flintloader.loader.api.ModuleOrigin;
-
 import java.nio.file.Path;
 import java.util.List;
+
+import net.flintloader.loader.api.ModuleOrigin;
 
 public class ModuleOriginImpl implements ModuleOrigin {
 

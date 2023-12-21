@@ -16,12 +16,12 @@
 **/
 package net.flintloader.loader.modules.entrypoint;
 
-import net.flintloader.punch.impl.launch.PunchLauncherBase;
-import net.flintloader.punch.impl.util.LoaderUtil;
-
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import net.flintloader.punch.impl.launch.PunchLauncherBase;
+import net.flintloader.punch.impl.util.LoaderUtil;
 
 /**
  * @author HypherionSA

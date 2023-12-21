@@ -32,7 +32,6 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipException;
 
 import net.flintloader.loader.api.ModuleContainer;
-import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.resolver.IModuleResolver;
 import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;

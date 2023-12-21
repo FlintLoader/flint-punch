@@ -32,7 +32,6 @@ import net.flintloader.punch.impl.util.log.Log;
 import net.flintloader.punch.impl.util.log.LogCategory;
 import net.flintloader.punch.impl.util.version.VersionParser;
 import net.flintloader.punch.impl.util.version.VersionPredicateParser;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;

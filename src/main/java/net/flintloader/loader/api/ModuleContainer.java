@@ -16,13 +16,13 @@
 **/
 package net.flintloader.loader.api;
 
-import net.flintloader.loader.modules.FlintModuleMetadata;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import net.flintloader.loader.modules.FlintModuleMetadata;
 
 public interface ModuleContainer {
 

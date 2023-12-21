@@ -16,14 +16,6 @@
 **/
 package net.flintloader.loader.modules;
 
-import net.flintloader.loader.api.FlintModule;
-import net.flintloader.loader.api.ModuleContainer;
-import net.flintloader.loader.api.ModuleOrigin;
-import net.flintloader.punch.impl.PunchLoaderImpl;
-import net.flintloader.punch.impl.util.FileSystemUtil;
-import net.flintloader.punch.impl.util.log.Log;
-import net.flintloader.punch.impl.util.log.LogCategory;
-
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -33,6 +25,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import net.flintloader.loader.api.ModuleContainer;
+import net.flintloader.loader.api.ModuleOrigin;
+import net.flintloader.punch.impl.PunchLoaderImpl;
+import net.flintloader.punch.impl.util.FileSystemUtil;
+import net.flintloader.punch.impl.util.log.Log;
+import net.flintloader.punch.impl.util.log.LogCategory;
 
 public class ModuleContainerImpl implements ModuleContainer {
 
