@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.vdurmont.semver4j.Semver;
 import net.flintloader.loader.api.FlintModule;
 import net.flintloader.loader.api.FlintModuleContainer;
+import net.flintloader.loader.core.entrypoints.FlintEntryPoints;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
 import net.flintloader.loader.modules.Strings;
@@ -44,9 +45,6 @@ import org.jetbrains.annotations.ApiStatus;
 public final class PunchLauncherHooks {
 
 	public static final Gson gson = new Gson();
-
-	// TODO Move this to a separate handler, to allow custom entry points
-	private static final Map<String, FlintModule> entryPoints = new HashMap<>();
 
 	/**
 	 * Discover installed modules from modules dir and classpath during development
@@ -121,47 +119,15 @@ public final class PunchLauncherHooks {
 	}
 
 	/**
-	 * Call the {@link FlintModule#earlyInitialization()} method on modules
-	 */
-	public static void earlyInitModules() {
-		entryPoints.forEach((s, flintModule) -> {
-			try {
-				flintModule.earlyInitialization();
-			} catch (Exception e) {
-				Log.error(LogCategory.ENTRYPOINT, "Failed to call early entry point on module '" + s + "'");
-			}
-		});
-	}
-
-	/**
-	 * Call the {@link FlintModule#initializeModule()} method on modules
-	 */
-	public static void initializeModules() {
-		entryPoints.forEach((s, flintModule) -> {
-			try {
-				flintModule.initializeModule();
-			} catch (Exception e) {
-				Log.error(LogCategory.ENTRYPOINT, "Failed to call entry point on module '" + s + "'");
-			}
-		});
-    }
-
-	/**
 	 * Discover declared entry points from modules
 	 */
 	public static void gatherEntryPoints() {
 		for (FlintModuleContainer container : ModuleList.getInstance().allModules()) {
 			FlintModuleMetadata metadata = container.getMetadata();
-
-			if (metadata.isBuiltIn() || !metadata.getEntryPoint("main").isPresent())
+			if (metadata.isBuiltIn() || metadata.getEntryPoints() == null || metadata.getEntryPoints().isEmpty())
 				continue;
 
-			try {
-				Class<?> clazz = EntryPointUtil.getClass(metadata.getEntryPoint("main").get());
-				entryPoints.put(metadata.getId(), (FlintModule) EntryPointUtil.createInstance(clazz));
-			} catch (Exception e) {
-				Log.error(LogCategory.ENTRYPOINT, "Failed to discover entry points for '" + metadata.getId() + "'", e);
-			}
+			metadata.getEntryPoints().forEach((s, k) -> FlintEntryPoints.add(metadata, s, k));
 		}
 	}
 

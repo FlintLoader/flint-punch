@@ -35,7 +35,9 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.flintloader.loader.api.FlintModule;
 import net.flintloader.loader.core.PunchLauncherHooks;
+import net.flintloader.loader.core.entrypoints.FlintEntryPoints;
 import net.flintloader.punch.impl.FormattedException;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.game.GameProvider;
@@ -132,7 +134,7 @@ public final class Punch extends PunchLauncherBase {
 		provider.unlockClassPath(this);
 		unlocked = true;
 
-		PunchLauncherHooks.earlyInitModules();
+		FlintEntryPoints.invoke("early", FlintModule.class, FlintModule::earlyInitialization);
 
 		return cl;
 	}

@@ -34,7 +34,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import net.flintloader.loader.api.FlintModule;
 import net.flintloader.loader.core.PunchLauncherHooks;
+import net.flintloader.loader.core.entrypoints.FlintEntryPoints;
 import net.flintloader.punch.impl.FormattedException;
 import net.flintloader.punch.impl.PunchLoaderImpl;
 import net.flintloader.punch.impl.game.GameProvider;
@@ -157,7 +159,7 @@ public abstract class PunchTweaker extends PunchLauncherBase implements ITweaker
 		MixinEnvironment.getDefaultEnvironment().setSide(MixinEnvironment.Side.CLIENT);
 
 		provider.unlockClassPath(this);
-		PunchLauncherHooks.earlyInitModules();
+		FlintEntryPoints.invoke("early", FlintModule.class, FlintModule::earlyInitialization);
 	}
 
 	@Override
