@@ -1,6 +1,6 @@
 /**
 * Copyright 2016 FabricMC
-* Copyright 2023 Flint Loader Contributors
+* Copyright 2024 Flint Loader Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -384,7 +384,7 @@ public class EntrypointPatch extends GamePatch {
 
 	private Version getGameVersion() {
 		try {
-			return VersionParser.parseSemantic(gameProvider.getNormalizedGameVersion());
+			return Version.parse(gameProvider.getNormalizedGameVersion());
 		} catch (VersionParsingException e) {
 			throw new RuntimeException(e);
 		}
