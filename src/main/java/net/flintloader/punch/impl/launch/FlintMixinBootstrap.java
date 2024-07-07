@@ -53,7 +53,6 @@ public final class FlintMixinBootstrap {
 		System.setProperty("mixin.service", MixinServicePunch.class.getName());
 
 		MixinBootstrap.init();
-		MixinExtrasBootstrap.init();
 		MixinEnvironment.getCurrentEnvironment().setSide(MixinEnvironment.Side.CLIENT);
 
 		if (PunchLauncherBase.getLauncher().isDevelopment()) {
@@ -95,6 +94,7 @@ public final class FlintMixinBootstrap {
 		try {
 			IMixinConfig.class.getMethod("decorate", String.class, Object.class);
 			MixinConfigDecorator.apply(configToModuleMap);
+			MixinExtrasBootstrap.init();
 		} catch (NoSuchMethodException e) {
 			Log.info(LogCategory.MIXIN, "Detected old Mixin version without config decoration support");
 		}
