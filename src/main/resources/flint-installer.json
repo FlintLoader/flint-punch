@@ -9,7 +9,7 @@
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
-        "name": "net.fabricmc:sponge-mixin:0.13.3+mixin.0.8.5",
+        "name": "net.fabricmc:sponge-mixin:0.14.0+mixin.0.8.6",
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
@@ -21,23 +21,27 @@
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
-        "name": "org.ow2.asm:asm:9.4",
+        "name": "org.ow2.asm:asm:9.6",
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
-        "name": "org.ow2.asm:asm-analysis:9.4",
+        "name": "org.ow2.asm:asm-analysis:9.6",
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
-        "name": "org.ow2.asm:asm-commons:9.4",
+        "name": "org.ow2.asm:asm-commons:9.6",
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
-        "name": "org.ow2.asm:asm-tree:9.4",
+        "name": "org.ow2.asm:asm-tree:9.6",
         "url": "https://maven.flintloader.net/mirror/"
       },
       {
-        "name": "org.ow2.asm:asm-util:9.4",
+        "name": "org.ow2.asm:asm-util:9.6",
+        "url": "https://maven.flintloader.net/mirror/"
+      },
+      {
+        "name": "io.github.llamalad7:mixinextras-common:0.3.5",
         "url": "https://maven.flintloader.net/mirror/"
       }
     ],

@@ -79,6 +79,7 @@ dependencies {
 
 	include 'org.ow2.sat4j:org.ow2.sat4j.core:2.3.6'
 	include 'org.ow2.sat4j:org.ow2.sat4j.pb:2.3.6'
+	api(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
 
 	include 'com.vdurmont:semver4j:3.1.0'
 }
@@ -146,6 +147,7 @@ task fatJar(type: ShadowJar, dependsOn: getSat4jAbout) {
 	exclude 'META-INF/maven/org.ow2.sat4j/*/**'
 
 	outputs.upToDateWhen { false }
+	mergeServiceFiles()
 }
 
 File proguardFile = file("build/libs/punch-${version}.jar")

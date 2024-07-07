@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.flintloader.loader.api.FlintModuleContainer;
 import net.flintloader.loader.modules.FlintModuleMetadata;
 import net.flintloader.loader.modules.ModuleList;
@@ -52,6 +53,7 @@ public final class FlintMixinBootstrap {
 		System.setProperty("mixin.service", MixinServicePunch.class.getName());
 
 		MixinBootstrap.init();
+		MixinExtrasBootstrap.init();
 		MixinEnvironment.getCurrentEnvironment().setSide(MixinEnvironment.Side.CLIENT);
 
 		if (PunchLauncherBase.getLauncher().isDevelopment()) {
