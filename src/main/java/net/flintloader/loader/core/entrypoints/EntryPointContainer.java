@@ -60,4 +60,9 @@ public class EntryPointContainer<T> implements EntryPointHolder<T> {
 	public FlintModuleMetadata getProvider() {
 		return entry.getModuleContainer();
 	}
+
+	@Override
+	public String getDefinition() {
+		return entry.getDefinition();
+	}
 }

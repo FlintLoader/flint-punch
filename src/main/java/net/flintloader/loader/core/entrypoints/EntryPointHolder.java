@@ -22,5 +22,8 @@ public interface EntryPointHolder<T> {
 
 	T getEntryPoint();
 	FlintModuleMetadata getProvider();
+	default String getDefinition() {
+		return "";
+	}
 
 }

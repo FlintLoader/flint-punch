@@ -79,7 +79,7 @@ dependencies {
 
 	include 'org.ow2.sat4j:org.ow2.sat4j.core:2.3.6'
 	include 'org.ow2.sat4j:org.ow2.sat4j.pb:2.3.6'
-	api(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
+	api(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 
 	include 'com.vdurmont:semver4j:3.1.0'
 }

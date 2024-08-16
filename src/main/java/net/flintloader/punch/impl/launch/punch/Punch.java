@@ -311,5 +311,6 @@ public final class Punch extends PunchLauncherBase {
 
 	static {
 		LoaderUtil.verifyNotInTargetCl(Punch.class);
+		LoaderUtil.verifyClasspath();
 	}
 }

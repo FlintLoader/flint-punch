@@ -72,9 +72,14 @@ public class MixinServicePunch implements IMixinService, IClassProvider, IClassB
 
 	@Override
 	public ClassNode getClassNode(String name, boolean runTransformers) throws ClassNotFoundException, IOException {
+		return getClassNode(name, runTransformers, 0);
+	}
+
+	@Override
+	public ClassNode getClassNode(String name, boolean runTransformers, int readerFlags) throws ClassNotFoundException, IOException {
 		ClassReader reader = new ClassReader(getClassBytes(name, runTransformers));
 		ClassNode node = new ClassNode();
-		reader.accept(node, 0);
+		reader.accept(node, readerFlags);
 		return node;
 	}
 
@@ -223,7 +228,7 @@ public class MixinServicePunch implements IMixinService, IClassProvider, IClassB
 
 	@Override
 	public MixinEnvironment.CompatibilityLevel getMaxCompatibilityLevel() {
-		return MixinEnvironment.CompatibilityLevel.JAVA_17;
+		return MixinEnvironment.CompatibilityLevel.JAVA_22;
 	}
 
 	@Override

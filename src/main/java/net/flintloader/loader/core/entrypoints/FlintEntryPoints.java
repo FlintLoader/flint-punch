@@ -113,8 +113,8 @@ public class FlintEntryPoints {
 			} catch (Throwable t) {
 				exception = ExceptionUtil.gatherExceptions(t,
 						exception,
-						exc -> new RuntimeException(String.format("Could not execute entrypoint stage '%s' due to errors, provided by '%s'!",
-								name, container.getProvider().getId()),
+						exc -> new RuntimeException(String.format("Could not execute entrypoint stage '%s' due to errors, provided by '%s' at %s!",
+								name, container.getProvider().getId(), container.getDefinition()),
 								exc));
 			}
 		}
@@ -230,6 +230,7 @@ public class FlintEntryPoints {
 		<T> T getOrCreate(Class<T> type) throws Exception;
 		boolean isOptional();
 		FlintModuleMetadata getModuleContainer();
+		String getDefinition();
 	}
 
 	static class FlintEntry implements Entry {
@@ -273,6 +274,11 @@ public class FlintEntryPoints {
 		@Override
 		public FlintModuleMetadata getModuleContainer() {
 			return mod;
+		}
+
+		@Override
+		public String getDefinition() {
+			return value;
 		}
 	}
 
